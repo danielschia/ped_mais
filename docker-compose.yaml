@@ -15,15 +15,51 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   web:
     build: .
+    command: bash -c "bundle exec rails db:prepare && bundle exec rails s -b 0.0.0.0"
     ports:
       - "3000:3000"
+    volumes:
+      - .:/myapp  # Mount to /myapp instead of /app
+      - /app      # Keep the original /app from the image
+    working_dir: /myapp  # Set working directory to the mounted code
     environment:
       DATABASE_URL: postgresql://postgres:password@db:5432/ped_mais_development
+      REDIS_URL: redis://redis:6379/0
     depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+
+  worker:
+    build: .
+    command: bundle exec sidekiq
+    volumes:
+      - .:/myapp
+      - /app
+    working_dir: /myapp
+    environment:
+      DATABASE_URL: postgresql://postgres:password@db:5432/ped_mais_development
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      redis:
+        condition: service_healthy
       db:
         condition: service_healthy
 
 volumes:
   postgres_data:
+  redis_data:

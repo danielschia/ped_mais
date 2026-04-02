@@ -4,8 +4,9 @@ class OrdersController < ApplicationController
   end
 
   def create
-    order = @current_user.orders.new(order_params)
+    order = @current_user.orders.new(order_params.merge(status: 'pending'))
     if order.save
+      ProcessOrderJob.perform_async(order.id)
       render json: order, status: :created
     else
       render json: { errors: order.errors.full_messages }, status: :unprocessable_entity

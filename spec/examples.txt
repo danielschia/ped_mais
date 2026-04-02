@@ -1,0 +1,6 @@
+example_id                              | status | run_time        |
+--------------------------------------- | ------ | --------------- |
+./spec/requests/auth_spec.rb[1:1:1:1:1] | passed | 0.05939 seconds |
+./spec/requests/auth_spec.rb[1:1:1:2:1] | passed | 0.00979 seconds |
+./spec/requests/auth_spec.rb[1:2:1:1:1] | passed | 0.0138 seconds  |
+./spec/requests/auth_spec.rb[1:2:1:2:1] | passed | 0.00344 seconds |
