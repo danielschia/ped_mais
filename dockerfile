@@ -13,23 +13,25 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     postgresql-client \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy Gemfile first for layer caching
+ENV RAILS_ENV=production \
+    BUNDLE_WITHOUT="development test"
+
 COPY Gemfile Gemfile.lock ./
 
-# Install gems
 RUN gem update --system && \
-    bundle config set --local without 'production' && \
-    bundle install --no-cache --jobs 4
+    bundle install --jobs 4 --retry 3
 
-# Copy application code
+# Copy app
 COPY . .
 
-# Regenerate binstubs in case they're different
+RUN bundle exec rake assets:precompile
+
+# Binstubs
 RUN bundle binstubs --all
 
 EXPOSE 3000
 
-# Create entrypoint script to run migrations and start server
+# Entrypoint melhorado
 RUN echo '#!/bin/bash\n\
 set -e\n\
 \n\
@@ -40,10 +42,12 @@ done\n\
 \n\
 echo "Database ready!"\n\
 \n\
-echo "Skipping migrations..."\n\
+echo "Running migrations..."\n\
+bundle exec rails db:migrate\n\
 \n\
 exec "$@"\n\
 ' > /app/docker-entrypoint.sh && chmod +x /app/docker-entrypoint.sh
 
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
-CMD ["/app/bin/rails", "s", "-b", "0.0.0.0"]
+
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]
