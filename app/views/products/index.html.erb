@@ -1,0 +1,15 @@
+<h1>Produtos de <%= @restaurant.name %></h1>
+
+<%= link_to "Novo Produto", new_restaurant_product_path(@restaurant) %> |
+<%= link_to "Voltar para Restaurantes", restaurants_path %>
+
+<hr>
+
+<ul>
+  <% @products.each do |product| %>
+    <li>
+      <%= link_to product.name, [@restaurant, product] %> -
+      R$ <%= product.price %>
+    </li>
+  <% end %>
+</ul>

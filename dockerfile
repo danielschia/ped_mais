@@ -24,7 +24,7 @@ RUN gem update --system && \
 # Copy app
 COPY . .
 
-RUN bundle exec rake assets:precompile
+# RUN bundle exec rake assets:precompile
 
 # Binstubs
 RUN bundle binstubs --all
@@ -48,6 +48,6 @@ bundle exec rails db:migrate\n\
 exec "$@"\n\
 ' > /app/docker-entrypoint.sh && chmod +x /app/docker-entrypoint.sh
 
-ENTRYPOINT ["/app/docker-entrypoint.sh"]
+# ENTRYPOINT ["/app/docker-entrypoint.sh"]
 
 CMD ["bundle", "exec", "puma", "-C", "config/puma.rb"]

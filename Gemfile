@@ -43,3 +43,11 @@ group :development do
   # Speed up commands on slow machines / big apps [https://github.com/rails/spring]
   # gem "spring"
 end
+
+gem "devise", "~> 5.0"
+
+gem "importmap-rails"
+gem "sprockets-rails"
+gem "turbo-rails"
+gem "stimulus-rails"
+

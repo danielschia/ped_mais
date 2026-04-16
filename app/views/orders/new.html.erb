@@ -1,0 +1,10 @@
+<h1>Novo Pedido</h1>
+
+<%= form_with model: @order do |f| %>
+  <div>
+    <%= f.label :total %>
+    <%= f.number_field :total %>
+  </div>
+
+  <%= f.submit "Criar pedido" %>
+<% end %>

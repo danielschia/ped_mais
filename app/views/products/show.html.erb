@@ -1,0 +1,10 @@
+<h1><%= @product.name %></h1>
+
+<p>
+  <strong>Preço:</strong>
+  R$ <%= @product.price %>
+</p>
+
+<%= link_to "Editar", edit_restaurant_product_path(@restaurant, @product) %> |
+<%= link_to "Excluir", [@restaurant, @product], method: :delete, data: { confirm: "Tem certeza?" } %> |
+<%= link_to "Voltar", restaurant_products_path(@restaurant) %>

@@ -2,7 +2,7 @@ default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch('RAILS_MAX_THREADS') { 5 } %>
-  host: db
+  host: <%= ENV.fetch("DB_HOST", "localhost") %>
   username: postgres
   password: password
 
@@ -19,3 +19,4 @@ production:
   database: ped_mais_production
   username: ped_mais
   password: <%= ENV['PED_MAIS_DATABASE_PASSWORD'] %>
+  url: <%= ENV["DATABASE_URL"] %>

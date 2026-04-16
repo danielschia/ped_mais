@@ -9,22 +9,12 @@ services:
       POSTGRES_DB: ped_mais_development
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   redis:
     image: redis:7-alpine
     command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
 
   web:
     build: .
@@ -32,33 +22,27 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - .:/myapp  # Mount to /myapp instead of /app
-      - /app      # Keep the original /app from the image
-    working_dir: /myapp  # Set working directory to the mounted code
+      - .:/app
     environment:
       DATABASE_URL: postgresql://postgres:password@db:5432/ped_mais_development
       REDIS_URL: redis://redis:6379/0
+      RAILS_ENV: development
     depends_on:
-      redis:
-        condition: service_healthy
-      db:
-        condition: service_healthy
+      - db
+      - redis
 
   worker:
     build: .
     command: bundle exec sidekiq
     volumes:
-      - .:/myapp
-      - /app
-    working_dir: /myapp
+      - .:/app
     environment:
       DATABASE_URL: postgresql://postgres:password@db:5432/ped_mais_development
       REDIS_URL: redis://redis:6379/0
+      RAILS_ENV: development
     depends_on:
-      redis:
-        condition: service_healthy
-      db:
-        condition: service_healthy
+      - db
+      - redis
 
 volumes:
   postgres_data:

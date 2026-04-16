@@ -1,0 +1,11 @@
+<h1>Pedidos</h1>
+
+<%= link_to "Novo pedido", new_order_path %>
+
+<ul>
+  <% @orders.each do |order| %>
+    <li>
+      Pedido #<%= order.id %> - <%= order.status %> - R$ <%= order.total %>
+    </li>
+  <% end %>
+</ul>

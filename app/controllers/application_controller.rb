@@ -1,19 +1,12 @@
-class ApplicationController < ActionController::API
-  before_action :authorize_request
+class ApplicationController < ActionController::Base
+  before_action :authenticate_user!
 
-  def authorize_request
-    header = request.headers['Authorization']
-    if header.present?
-      token = header.split(' ').last
+  before_action :configure_permitted_parameters, if: :devise_controller?
 
-      begin
-        decoded = JwtService.decode(token)
-        @current_user = User.find(decoded[:user_id])
-      rescue
-        render json: { error: 'Unauthorized' }, status: :unauthorized
-      end
-    else
-      render json: { error: 'Missing token' }, status: :unauthorized
-    end
+  helper_method :current_user
+  protected
+
+  def configure_permitted_parameters
+    devise_parameter_sanitizer.permit(:sign_up, keys: [:email])
   end
 end

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>PedMais</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <nav>
+      <%= link_to "Pedidos", orders_path %> |
+      <%= link_to "Restaurantes", restaurants_path %> |
+
+      <% if user_signed_in? %>
+        <span>Olá, <%= current_user.email %></span> |
+        <%= button_to "Logout", destroy_user_session_path, method: :delete %>
+      <% else %>
+        <%= link_to "Login", new_user_session_path %>
+      <% end %>
+    </nav>
+
+    <hr>
+
+    <p><%= notice %></p>
+
+    <%= yield %>
+  </body>
+</html>
