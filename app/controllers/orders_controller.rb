@@ -14,19 +14,34 @@ class OrdersController < ApplicationController
   end
 
   def create
-    @order = current_user.orders.new(order_params.merge(status: 'pending'))
+    ActiveRecord::Base.transaction do
+      items = params[:items] || []
+      @order = current_user.orders.new(status: 'pending')
+      @order.save!
+      products = Product.where(id: items.map { |i| i[:product_id] }).index_by(&:id)
+      items.each do |item|
+        product = products[item[:product_id]]
 
-    if @order.save
+        next unless product
+        @order.order_items.create!(
+          product: products,
+          quantity: item[:quantity],
+          price: product.price
+        )
+      end
       ProcessOrderJob.perform_async(@order.id)
-      redirect_to @order, notice: 'Pedido criado com sucesso!'
-    else
-      render :new, status: :unprocessable_entity
     end
+    redirect_to @order, notice: "Pedido criado com sucesso."
+    rescue ActiveRecord::RecordInvalid => e
+      Rails.logger.error(e.message)
+      @order ||= current_user.orders.new
+      @order.errors.add(:base, "Erro ao criar pedido: #{e.message}")
+      render :new, status: :unprocessable_entity
   end
 
   private
 
   def order_params
-    params.require(:order).permit(:total)
+    params.require(:order).permit()
   end
 end
