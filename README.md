@@ -1,24 +1,9 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+This is a little project to put together some of the tools I'm familiar with and practice some that I need to learn better.
 
-Things you may want to cover:
+It's a food delivery system, with a web interface and an API, deployed in Render.
 
-* Ruby version
+If you found any major issue or have recommendations, please let me know.
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+It'll take a while to actually look better, but I'm pretty happy on how it's going.
