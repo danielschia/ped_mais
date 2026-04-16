@@ -18,4 +18,4 @@ test:
   database: ped_mais_test
 
 production:
-  url: <%= ENV["DATABASE_URL"] %>
+  url: <%= ENV["DATABASE_URL"] || "postgresql://postgres:password@localhost:5432/ped_mais_development" %>
