@@ -1,10 +1,5 @@
 <h1>Novo Restaurante</h1>
 
-<%= form_with model: @restaurant do |f| %>
-  <div>
-    <%= f.label :name %>
-    <%= f.text_field :name %>
-  </div>
+<%= render "form", restaurant: @restaurant %>
 
-  <%= f.submit "Criar restaurante" %>
-<% end %>
+<%= link_to "Voltar", restaurants_path(@restaurant) %>

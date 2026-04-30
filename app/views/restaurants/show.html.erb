@@ -1,0 +1,17 @@
+<h1><%= @restaurant.name %></h1>
+
+<% if @restaurant.products.any? %>
+  <h2>Produtos:</h2>
+  <ul>
+    <%= render @restaurant.products %>
+  </ul>
+<% else %>
+  <h2>Nenhum produto cadastrado ainda.</h2>
+<% end %>
+<p>
+  <%= link_to "Adicionar produto", new_restaurant_product_path(@restaurant) %>
+</p>
+
+<%= link_to "Editar", edit_restaurant_path(@restaurant) %> |
+<%= link_to "Excluir", [@restaurant], method: :delete, data: { confirm: "Tem certeza?" } %> |
+<%= link_to "Voltar", restaurants_path(@restaurant) %>

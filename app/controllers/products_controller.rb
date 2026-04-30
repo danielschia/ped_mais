@@ -14,7 +14,7 @@ class ProductsController < ApplicationController
   end
 
   def create
-    @product = restaurant.products.new(product_params)
+    @product = @restaurant.products.new(product_params)
 
     if @product.save
       redirect_to [@restaurant, @product], notice: 'Produto criado com sucesso.'
