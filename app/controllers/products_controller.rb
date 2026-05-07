@@ -1,5 +1,6 @@
 class ProductsController < ApplicationController
   before_action :authenticate_user!
+  before_action :require_owner!
   before_action :set_restaurant
   before_action :set_product, only: %i[show update destroy]
 
@@ -41,7 +42,7 @@ class ProductsController < ApplicationController
   private
 
   def set_restaurant
-    @restaurant = Restaurant.find(params[:restaurant_id])
+    @restaurant = current_user.restaurant.find(params[:restaurant_id])
   end
 
   def set_product

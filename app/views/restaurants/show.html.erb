@@ -12,6 +12,8 @@
   <%= link_to "Adicionar produto", new_restaurant_product_path(@restaurant) %>
 </p>
 
-<%= link_to "Editar", edit_restaurant_path(@restaurant) %> |
-<%= link_to "Excluir", [@restaurant], method: :delete, data: { confirm: "Tem certeza?" } %> |
+<% if current_user.owner? && @restaurant.owner == current_user %>
+  <%= link_to "Editar", edit_restaurant_path(@restaurant) %> |
+  <%= link_to "Excluir", [@restaurant], method: :delete, data: { confirm: "Tem certeza?" } %> |
+<% end %>
 <%= link_to "Voltar", restaurants_path(@restaurant) %>

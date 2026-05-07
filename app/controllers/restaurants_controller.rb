@@ -1,4 +1,5 @@
 class RestaurantsController < ApplicationController
+  before_action :require_owner!, except: %i[index show]
   before_action :set_restaurant, only: %i[show edit update destroy]
 
   def index
@@ -42,7 +43,11 @@ class RestaurantsController < ApplicationController
   private
 
   def set_restaurant
-    @restaurant = Restaurant.find(params[:id])
+    if current_user.owner?
+      @restaurant = current_user.restaurants.find(params[:id])
+    else
+      @restaurant = Restaurant.find(params[:id])
+    end
   end
 
   def restaurant_params
