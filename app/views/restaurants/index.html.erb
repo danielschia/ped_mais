@@ -1,6 +1,8 @@
 <h1>Restaurantes</h1>
 
-<%= link_to "Novo Restaurante", new_restaurant_path %>
+<% if current_user&.owner?%>
+  <%= link_to "Novo Restaurante", new_restaurant_path %>
+<% end %>
 
 <ul>
   <% @restaurants.each do |restaurant| %>

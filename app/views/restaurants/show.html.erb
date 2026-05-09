@@ -9,7 +9,9 @@
   <h2>Nenhum produto cadastrado ainda.</h2>
 <% end %>
 <p>
-  <%= link_to "Adicionar produto", new_restaurant_product_path(@restaurant) %>
+  <% if current_user&.owner?%>
+    <%= link_to "Adicionar produto", new_restaurant_product_path(@restaurant) %>
+  <% end %>
 </p>
 
 <% if current_user.owner? && @restaurant.owner == current_user %>
