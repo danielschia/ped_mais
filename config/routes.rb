@@ -1,9 +1,15 @@
-Rails.application.routes.draw do
+require 'sidekiq/web'
 
+Rails.application.routes.draw do
+  resources :orders, only: [:index, :show]
   resources :restaurants do
     resources :products
+    resources :orders, only: [:create, :new]
   end
-  resources :orders, only: [:index, :create, :show, :new]
+
+  # Admin dashboard for Sidekiq
+  mount Sidekiq::Web => '/sidekiq'
+
   devise_for :users
 
   root 'home#index'

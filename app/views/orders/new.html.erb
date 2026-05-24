@@ -1,10 +1,29 @@
 <h1>Novo Pedido</h1>
 
-<%= form_with model: @order do |f| %>
-  <div>
-    <%= f.label :total %>
-    <%= f.number_field :total %>
-  </div>
+<h2><%= @restaurant.name %></h2>
 
-  <%= f.submit "Criar pedido" %>
+<%= form_with url: restaurant_orders_path(@restaurant), method: :post do %>
+
+  <% @restaurant.products.each do |product| %>
+    <div>
+      <strong><%= product.name %></strong>
+      - R$ <%= product.price %>
+
+      <input
+        type="number"
+        name="items[][quantity]"
+        min="0"
+        value="0"
+      >
+
+      <input
+        type="hidden"
+        name="items[][product_id]"
+        value="<%= product.id %>"
+      >
+    </div>
+  <% end %>
+
+  <%= submit_tag "Criar Pedido" %>
+
 <% end %>

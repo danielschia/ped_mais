@@ -1,5 +1,6 @@
 class Order < ApplicationRecord
   belongs_to :user
+  belongs_to :restaurant
   enum status: {
     pending: 0,
     preparing: 1,

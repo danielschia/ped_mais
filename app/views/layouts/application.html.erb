@@ -12,10 +12,12 @@
 
   <body>
     <nav>
-      <%= link_to "Pedidos", orders_path %> |
+      <%= link_to "Início", root_path %> |
+
       <%= link_to "Restaurantes", restaurants_path %> |
 
       <% if user_signed_in? %>
+        <%= link_to "Meus Pedidos", orders_path %> |
         <span>Olá, <%= current_user.email %></span> |
         <%= button_to "Logout", destroy_user_session_path, method: :delete %>
       <% else %>
@@ -25,7 +27,13 @@
 
     <hr>
 
-    <p><%= notice %></p>
+    <% if notice %>
+      <p><%= notice %></p>
+    <% end %>
+
+    <% if alert %>
+      <p><%= alert %></p>
+    <% end %>
 
     <%= yield %>
   </body>

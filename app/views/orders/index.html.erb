@@ -1,11 +1,41 @@
-<h1>Pedidos</h1>
+<h1>Meus Pedidos</h1>
 
-<%= link_to "Novo pedido", new_order_path %>
+<% if @orders.any? %>
+  <% @orders.group_by { |order| order.order_items.first&.product&.restaurant }.each do |restaurant, orders| %>
 
-<ul>
-  <% @orders.each do |order| %>
-    <li>
-      Pedido #<%= order.id %> - <%= order.status %> - R$ <%= order.total %>
-    </li>
+    <div>
+      <h2>
+        <%= restaurant&.name || "Restaurante desconhecido" %>
+      </h2>
+
+      <ul>
+        <% orders.each do |order| %>
+          <li>
+            <strong>Pedido #<%= order.id %></strong><br>
+
+            Status:
+            <%= order.status %><br>
+
+            Total:
+            <%= number_to_currency(order.total) %><br>
+
+            Criado em:
+            <%= l(order.created_at, format: :short) %><br>
+
+            <%= link_to "Ver pedido", order_path(order) %>
+          </li>
+
+          <hr>
+        <% end %>
+      </ul>
+    </div>
+
   <% end %>
-</ul>
+
+<% else %>
+  <p>Você ainda não possui pedidos.</p>
+<% end %>
+
+<p>
+  <%= link_to "Voltar para Home", root_path %>
+</p>
