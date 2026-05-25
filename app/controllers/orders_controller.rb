@@ -1,14 +1,15 @@
 class OrdersController < ApplicationController
   before_action :authenticate_user!
-  before_action :require_customer!
+  before_action :require_customer!, only: %i[new create]
   before_action :set_restaurant, only: %i[new create]
+  before_action :require_owner!, only: [:update_status]
 
   def index
     if current_user.owner?
       @orders = Order.joins(order_items: :product)
                      .where(products: {
-                     restaurant_id: current_user.restaurants.ids
-                                      })
+                       restaurant_id: current_user.restaurants.ids
+                     })
                      .distinct
     else
       @orders = current_user.orders.order(created_at: :desc)
@@ -16,21 +17,33 @@ class OrdersController < ApplicationController
   end
 
   def show
-     @order =
-    if current_user.owner?
-      Order.joins(order_items: :product)
-           .where(products: {
-             restaurant_id: current_user.restaurants.ids
-           })
-           .distinct
-           .find(params[:id])
-    else
-      current_user.orders.find(params[:id])
-    end
+    @order =
+      if current_user.owner?
+        Order.joins(order_items: :product)
+             .where(products: {
+               restaurant_id: current_user.restaurants.ids
+             })
+             .distinct
+             .find(params[:id])
+      else
+        current_user.orders.find(params[:id])
+      end
+  end
+
+  def update_status
+    @order = Order.find(params[:id])
+
+    @order.update!(status: params[:status])
+
+    redirect_to orders_path,
+                notice: "Status atualizado para #{@order.status}."
   end
 
   def new
-    @order = current_user.orders.new
+    @order = current_user.orders.new(
+      restaurant: @restaurant,
+      status: :pending
+    )
   end
 
   def create
@@ -39,7 +52,12 @@ class OrdersController < ApplicationController
         item[:quantity].to_i.positive?
       end
 
-      @order = current_user.orders.new(status: 'pending')
+      @order = current_user.orders.new(
+        restaurant: @restaurant,
+        status: :pending,
+        total: 0
+      )
+
       @order.save!
 
       products = Product.where(
@@ -56,14 +74,26 @@ class OrdersController < ApplicationController
         )
       end
 
+      @order.calculate_total
+      @order.save!
+
       ProcessOrderJob.perform_async(@order.id)
     end
 
-    redirect_to @order, notice: "Pedido criado com sucesso."  rescue ActiveRecord::RecordInvalid => e
+    redirect_to @order,
+                notice: "Pedido criado com sucesso."
+
+  rescue ActiveRecord::RecordInvalid => e
     Rails.logger.error(e.message)
 
-    @order ||= current_user.orders.new
-    @order.errors.add(:base, "Erro ao criar pedido: #{e.message}")
+    @order ||= current_user.orders.new(
+      restaurant: @restaurant
+    )
+
+    @order.errors.add(
+      :base,
+      "Erro ao criar pedido: #{e.message}"
+    )
 
     render :new, status: :unprocessable_entity
   end
@@ -71,6 +101,7 @@ class OrdersController < ApplicationController
   private
 
   def set_restaurant
-    @restaurant = Restaurant.includes(:products).find(params[:restaurant_id])
+    @restaurant = Restaurant.includes(:products)
+                            .find(params[:restaurant_id])
   end
 end

@@ -1,7 +1,11 @@
 require 'sidekiq/web'
 
 Rails.application.routes.draw do
-  resources :orders, only: [:index, :show]
+  resources :orders, only: [:index, :show] do
+    member do
+      patch :update_status
+    end
+  end
   resources :restaurants do
     resources :products
     resources :orders, only: [:create, :new]

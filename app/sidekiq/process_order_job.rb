@@ -4,9 +4,15 @@ class ProcessOrderJob
   def perform(order_id)
     order = Order.find(order_id)
 
-    order.update(status: 'processing')
-    puts "Processing order #{order.id} for user #{order.user_id}"
-    sleep(10)
-    order.update(status: 'completed')
+    Rails.logger.info(
+      "Novo pedido ##{order.id} criado por #{order.user.email}"
+    )
+
+    # Simulação de processamento assíncrono
+    sleep(5)
+
+    Rails.logger.info(
+      "Pedido ##{order.id} enviado para o restaurante."
+    )
   end
 end

@@ -1,6 +1,23 @@
 <h1>Pedido <%= @order.id %></h1>
+<h2>Restaurante: <%= @order.restaurant.name %></h2>
+
 
 <p>Status: <%= @order.status %></p>
+<% if current_user.owner? %>
+  <div>
+    <%= button_to "Preparando",
+      update_status_order_path(@order, status: :preparing),
+      method: :patch %>
+
+    <%= button_to "Entregue",
+      update_status_order_path(@order, status: :delivered),
+      method: :patch %>
+
+    <%= button_to "Cancelar",
+      update_status_order_path(@order, status: :canceled),
+      method: :patch %>
+  </div>
+<% end %>
 <p>Total: <%= @order.total %></p>
 
 <%= link_to "Voltar", orders_path %>
