@@ -89,10 +89,20 @@ class OrdersController < ApplicationController
   end
 
   def preparing
-    @order = current_user.orders.find(params[:id])
-    @order.start_preparing!
-    redirect_to @order,
-                notice: 'Pedido em preparação.'
+    if current_user.owner?
+      @order = Order.joins(order_items: :product)
+                    .where(products: {
+                      restaurant_id: current_user.restaurants.ids
+                    })
+                    .distinct
+                    .find(params[:id])
+      @order.start_preparing!
+      redirect_to @order,
+                  notice: 'Pedido em preparação.'
+    else
+      redirect_to orders_path,
+                  alert: 'Acesso negado.'
+    end
   end
 
   def confirm_delivery
@@ -118,17 +128,5 @@ class OrdersController < ApplicationController
   def set_restaurant
     @restaurant = Restaurant.includes(:products)
                             .find(params[:restaurant_id])
-  end
-
-  def start_preparing!
-    update!(status: :preparing)
-  end
-
-  def confirm_delivery!
-    update!(status: :delivered)
-  end
-
-  def cancel!
-    update!(status: :canceled)
   end
 end

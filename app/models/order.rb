@@ -22,13 +22,27 @@ class Order < ApplicationRecord
     end
   end
 
+  def start_preparing!
+    update!(status: :preparing)
+  end
+
+  def confirm_delivery!
+    update!(status: :delivered)
+  end
+
+  def cancel!
+    update!(status: :canceled)
+  end
+
   private
 
   def status_cannot_change_if_finished
-    return unless persisted? && will_save_change_to_status?
+    return unless persisted?
+    return unless will_save_change_to_status?
 
-    if delivered? || canceled?
-      errors.add(:status, "não pode ser alterado após o pedido ser entregue ou cancelado.")
-    end
+    previous_status = status_change_to_be_saved.first
+    return unless previous_status.in?(%w[delivered canceled])
+
+    errors.add(:status, 'não pode ser alterado após o pedido ser entregue ou cancelado.')
   end
 end
