@@ -3,12 +3,19 @@ require 'sidekiq/web'
 Rails.application.routes.draw do
   resources :orders, only: [:index, :show] do
     member do
-      patch :update_status
+      patch :confirm_delivery
+      patch :cancel
     end
   end
   resources :restaurants do
     resources :products
-    resources :orders, only: [:create, :new]
+    resources :orders, only: [:index, :create, :show, :new] do
+      member do
+        patch :confirm_delivery
+        patch :cancel
+        patch :preparing
+      end
+    end
   end
 
   # Admin dashboard for Sidekiq

@@ -3,20 +3,26 @@
 
 
 <p>Status: <%= @order.status %></p>
-<% if current_user.owner? %>
-  <div>
-    <%= button_to "Preparando",
-      update_status_order_path(@order, status: :preparing),
-      method: :patch %>
-
-    <%= button_to "Entregue",
-      update_status_order_path(@order, status: :delivered),
-      method: :patch %>
-
-    <%= button_to "Cancelar",
-      update_status_order_path(@order, status: :canceled),
-      method: :patch %>
-  </div>
+<% if current_user.owner? && @order.pending? %>
+  <%= button_to "Aceitar pedido",
+                preparing_restaurant_order_path(
+                  @order.restaurant,
+                  @order
+                ),
+                method: :patch %>
+<% end %>
+<% unless @order.delivered? || @order.canceled? %>
+  <%= button_to "Cancelar pedido",
+                cancel_restaurant_order_path(@order.restaurant, @order),
+                method: :patch,
+                data: { turbo_confirm: "Cancelar pedido?" } %>
+<% end %>
+<% if current_user == @order.user %>
+  <% if @order.preparing? %>
+    <%= button_to "Confirmar entrega",
+                  confirm_delivery_restaurant_order_path(@order.restaurant, @order),
+                  method: :patch %>
+  <% end %>
 <% end %>
 <p>Total: <%= @order.total %></p>
 

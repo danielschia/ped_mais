@@ -14,10 +14,21 @@ class Order < ApplicationRecord
 
   validates :total, numericality: { greater_than_or_equal_to: 0 }
   validates :status, presence: true
+  validate :status_cannot_change_if_finished
 
   def calculate_total
     self.total = order_items.sum do |item|
       item.quantity * item.price
+    end
+  end
+
+  private
+
+  def status_cannot_change_if_finished
+    return unless persisted? && will_save_change_to_status?
+
+    if delivered? || canceled?
+      errors.add(:status, "não pode ser alterado após o pedido ser entregue ou cancelado.")
     end
   end
 end

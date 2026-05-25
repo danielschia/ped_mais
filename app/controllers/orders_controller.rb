@@ -21,22 +21,13 @@ class OrdersController < ApplicationController
       if current_user.owner?
         Order.joins(order_items: :product)
              .where(products: {
-               restaurant_id: current_user.restaurants.ids
+                restaurant_id: current_user.restaurants.ids
              })
              .distinct
              .find(params[:id])
       else
         current_user.orders.find(params[:id])
       end
-  end
-
-  def update_status
-    @order = Order.find(params[:id])
-
-    @order.update!(status: params[:status])
-
-    redirect_to orders_path,
-                notice: "Status atualizado para #{@order.status}."
   end
 
   def new
@@ -81,8 +72,7 @@ class OrdersController < ApplicationController
     end
 
     redirect_to @order,
-                notice: "Pedido criado com sucesso."
-
+                notice: 'Pedido criado com sucesso.'
   rescue ActiveRecord::RecordInvalid => e
     Rails.logger.error(e.message)
 
@@ -98,10 +88,47 @@ class OrdersController < ApplicationController
     render :new, status: :unprocessable_entity
   end
 
+  def preparing
+    @order = current_user.orders.find(params[:id])
+    @order.start_preparing!
+    redirect_to @order,
+                notice: 'Pedido em preparação.'
+  end
+
+  def confirm_delivery
+    @order = current_user.orders.find(params[:id])
+
+    @order.confirm_delivery!
+
+    redirect_to @order,
+                notice: 'Entrega confirmada.'
+  end
+
+  def cancel
+    @order = current_user.orders.find(params[:id])
+
+    @order.cancel!
+
+    redirect_to @order,
+                notice: 'Pedido cancelado.'
+  end
+
   private
 
   def set_restaurant
     @restaurant = Restaurant.includes(:products)
                             .find(params[:restaurant_id])
+  end
+
+  def start_preparing!
+    update!(status: :preparing)
+  end
+
+  def confirm_delivery!
+    update!(status: :delivered)
+  end
+
+  def cancel!
+    update!(status: :canceled)
   end
 end
