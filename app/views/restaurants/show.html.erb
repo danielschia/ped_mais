@@ -1,25 +1,368 @@
-<h1><%= @restaurant.name %></h1>
+<div class="space-y-10">
 
-<% if @restaurant.products.any? %>
-  <h2>Produtos:</h2>
-  <ul>
-    <%= render @restaurant.products %>
-  </ul>
-<% else %>
-  <h2>Nenhum produto cadastrado ainda.</h2>
-<% end %>
-<p>
-  <% if current_user&.owner?%>
-    <%= link_to "Adicionar produto", new_restaurant_product_path(@restaurant) %>
+  <div class="
+    bg-white
+    rounded-3xl
+    overflow-hidden
+    shadow-sm
+    border border-gray-100
+  ">
+
+    <div class="
+      h-64
+      bg-gradient-to-br
+      from-red-400
+      to-red-600
+    "></div>
+
+    <div class="p-8">
+
+      <div class="
+        flex
+        flex-col
+        lg:flex-row
+        lg:items-center
+        lg:justify-between
+        gap-6
+      ">
+
+        <div>
+
+          <div class="
+            inline-flex
+            items-center
+            px-3 py-1
+            rounded-full
+            bg-red-100
+            text-red-500
+            text-sm
+            font-semibold
+            mb-4
+          ">
+            Aberto
+          </div>
+
+          <h1 class="
+            text-5xl
+            font-bold
+            text-gray-900
+          ">
+            <%= @restaurant.name %>
+          </h1>
+
+          <p class="
+            text-gray-500
+            mt-3
+            text-lg
+          ">
+            <%= pluralize(@restaurant.products.count, "produto") %>
+            disponíveis
+          </p>
+
+        </div>
+
+        <div class="flex flex-wrap gap-3">
+
+          <% if current_user&.owner? &&
+                @restaurant.owner == current_user %>
+
+            <%= link_to "Adicionar produto",
+                new_restaurant_product_path(@restaurant),
+                class: "
+                  bg-gray-900 hover:bg-black
+                  text-white
+                  font-medium
+                  px-5 py-3
+                  rounded-2xl
+                  transition
+                " %>
+
+            <%= link_to "Editar",
+                edit_restaurant_path(@restaurant),
+                class: "
+                  border border-gray-300
+                  hover:border-gray-400
+                  text-gray-700
+                  font-medium
+                  px-5 py-3
+                  rounded-2xl
+                  transition
+                " %>
+
+            <%= button_to "Excluir",
+                @restaurant,
+                method: :delete,
+                data: {
+                  turbo_confirm: "Tem certeza?"
+                },
+                class: "
+                  bg-red-100 hover:bg-red-200
+                  text-red-600
+                  font-medium
+                  px-5 py-3
+                  rounded-2xl
+                  transition
+                " %>
+
+          <% end %>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="
+    flex
+    items-center
+    justify-between
+  ">
+
+    <div>
+
+      <h2 class="
+        text-3xl
+        font-bold
+        text-gray-900
+      ">
+        Cardápio
+      </h2>
+
+      <p class="
+        text-gray-500
+        mt-2
+      ">
+        Escolha os itens do seu pedido.
+      </p>
+
+    </div>
+
+    <%= link_to "← Voltar",
+        restaurants_path,
+        class: "
+          text-gray-500
+          hover:text-gray-700
+          font-medium
+          transition
+        " %>
+
+  </div>
+
+  <% if @restaurant.products.any? %>
+
+    <% if current_user&.customer? %>
+
+      <%= form_with url: restaurant_orders_path(@restaurant),
+          method: :post do %>
+
+        <div class="
+          grid
+          grid-cols-1
+          md:grid-cols-2
+          xl:grid-cols-3
+          gap-8
+        ">
+
+          <% @restaurant.products.each do |product| %>
+
+            <div class="
+              group
+              bg-white
+              rounded-2xl
+              border border-gray-100
+              shadow-sm
+              hover:shadow-xl
+              hover:-translate-y-1
+              transition-all duration-300
+              overflow-hidden
+            ">
+
+              <div class="
+                h-40
+                bg-gradient-to-br
+                from-gray-100
+                to-gray-200
+              "></div>
+
+              <div class="p-6">
+
+                <div class="
+                  flex
+                  items-start
+                  justify-between
+                  gap-4
+                ">
+
+                  <div>
+
+                    <h3 class="
+                      text-2xl
+                      font-bold
+                      text-gray-900
+                      group-hover:text-red-500
+                      transition
+                    ">
+                      <%= product.name %>
+                    </h3>
+
+                    <p class="
+                      text-red-500
+                      font-semibold
+                      text-xl
+                      mt-3
+                    ">
+                      <%= number_to_currency(product.price) %>
+                    </p>
+
+                  </div>
+
+                </div>
+
+                <div class="mt-6">
+
+                  <label class="
+                    block
+                    text-sm
+                    text-gray-500
+                    mb-2
+                  ">
+                    Quantidade
+                  </label>
+
+                  <%= hidden_field_tag "items[][product_id]",
+                      product.id %>
+
+                  <%= number_field_tag "items[][quantity]",
+                      0,
+                      min: 0,
+                      class: "
+                        w-full
+                        rounded-xl
+                        border-gray-300
+                        shadow-sm
+                        focus:border-red-500
+                        focus:ring-red-500
+                      " %>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          <% end %>
+
+        </div>
+
+        <div class="
+          sticky
+          bottom-6
+          mt-10
+          flex
+          justify-end
+        ">
+
+          <%= submit_tag "Confirmar pedido",
+              class: "
+                bg-red-500 hover:bg-red-600
+                text-white
+                font-semibold
+                text-lg
+                px-8 py-4
+                rounded-2xl
+                shadow-lg hover:shadow-xl
+                transition
+              " %>
+
+        </div>
+
+      <% end %>
+
+    <% else %>
+
+      <div class="
+        grid
+        grid-cols-1
+        md:grid-cols-2
+        xl:grid-cols-3
+        gap-8
+      ">
+
+        <% @restaurant.products.each do |product| %>
+
+          <div class="
+            bg-white
+            rounded-2xl
+            border border-gray-100
+            shadow-sm
+            overflow-hidden
+          ">
+
+            <div class="
+              h-40
+              bg-gradient-to-br
+              from-gray-100
+              to-gray-200
+            "></div>
+
+            <div class="p-6">
+
+              <h3 class="
+                text-2xl
+                font-bold
+                text-gray-900
+              ">
+                <%= product.name %>
+              </h3>
+
+              <p class="
+                text-red-500
+                font-semibold
+                text-xl
+                mt-3
+              ">
+                <%= number_to_currency(product.price) %>
+              </p>
+
+            </div>
+
+          </div>
+
+        <% end %>
+
+      </div>
+
+    <% end %>
+
+  <% else %>
+
+    <div class="
+      bg-white
+      rounded-2xl
+      border border-dashed border-gray-300
+      p-16
+      text-center
+    ">
+
+      <h2 class="
+        text-2xl
+        font-semibold
+        text-gray-700
+      ">
+        Nenhum produto cadastrado ainda.
+      </h2>
+
+      <p class="
+        text-gray-500
+        mt-3
+      ">
+        Este restaurante ainda não possui itens disponíveis.
+      </p>
+
+    </div>
+
   <% end %>
-</p>
 
-<% if current_user&.customer?%>
-  <%= link_to "Fazer pedido", new_restaurant_order_path(@restaurant) %>
-<% end %>
-
-<% if current_user.owner? && @restaurant.owner == current_user %>
-  <%= link_to "Editar", edit_restaurant_path(@restaurant) %> |
-  <%= link_to "Excluir", [@restaurant], method: :delete, data: { confirm: "Tem certeza?" } %> |
-<% end %>
-<%= link_to "Voltar", restaurants_path(@restaurant) %>
+</div>

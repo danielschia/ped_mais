@@ -1,29 +1,333 @@
-<h1>Pedido <%= @order.id %></h1>
-<h2>Restaurante: <%= @order.restaurant.name %></h2>
+<div class="space-y-8">
 
+  <div class="
+    bg-white
+    rounded-3xl
+    shadow-xl
+    border border-gray-100
+    p-8
+  ">
 
-<p>Status: <%= @order.status %></p>
-<% if current_user.owner? && @order.pending? %>
-  <%= button_to "Aceitar pedido",
-                preparing_restaurant_order_path(
-                  @order.restaurant,
-                  @order
-                ),
-                method: :patch %>
-<% end %>
-<% unless @order.delivered? || @order.canceled? %>
-  <%= button_to "Cancelar pedido",
-                cancel_restaurant_order_path(@order.restaurant, @order),
-                method: :patch,
-                data: { turbo_confirm: "Cancelar pedido?" } %>
-<% end %>
-<% if current_user == @order.user %>
-  <% if @order.preparing? %>
-    <%= button_to "Confirmar entrega",
-                  confirm_delivery_restaurant_order_path(@order.restaurant, @order),
-                  method: :patch %>
-  <% end %>
-<% end %>
-<p>Total: <%= @order.total %></p>
+    <div class="
+      flex
+      flex-col
+      md:flex-row
+      md:items-center
+      md:justify-between
+      gap-6
+    ">
 
-<%= link_to "Voltar", orders_path %>
+      <div>
+
+        <p class="
+          text-sm
+          font-medium
+          text-gray-400
+          uppercase
+          tracking-wide
+          mb-2
+        ">
+          Pedido
+        </p>
+
+        <h1 class="
+          text-4xl
+          font-bold
+          text-gray-900
+        ">
+          #<%= @order.id %>
+        </h1>
+
+        <p class="
+          text-gray-500
+          mt-3
+        ">
+          Restaurante:
+          <span class="font-semibold text-gray-700">
+            <%= @order.restaurant.name %>
+          </span>
+        </p>
+
+      </div>
+
+      <div>
+
+        <% badge_classes =
+          case @order.status
+          when "pending"
+            "bg-yellow-100 text-yellow-700 border-yellow-200"
+          when "preparing"
+            "bg-blue-100 text-blue-700 border-blue-200"
+          when "delivered"
+            "bg-green-100 text-green-700 border-green-200"
+          when "canceled"
+            "bg-red-100 text-red-700 border-red-200"
+          end
+        %>
+
+        <span class="
+          inline-flex
+          items-center
+          rounded-full
+          border
+          px-4
+          py-2
+          text-sm
+          font-semibold
+          <%= badge_classes %>
+        ">
+          <%= @order.status.humanize %>
+        </span>
+
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="
+    bg-white
+    rounded-3xl
+    shadow-xl
+    border border-gray-100
+    p-8
+  ">
+
+    <div class="
+      flex
+      items-center
+      justify-between
+      mb-6
+    ">
+
+      <h2 class="
+        text-2xl
+        font-bold
+        text-gray-900
+      ">
+        Itens do Pedido
+      </h2>
+
+      <span class="
+        text-sm
+        text-gray-400
+      ">
+        <%= @order.order_items.count %> item(ns)
+      </span>
+
+    </div>
+
+    <div class="space-y-4">
+
+      <% @order.order_items.each do |item| %>
+
+        <div class="
+          flex
+          items-center
+          justify-between
+          rounded-2xl
+          border border-gray-100
+          p-4
+          hover:bg-gray-50
+          transition
+        ">
+
+          <div>
+
+            <h3 class="
+              text-lg
+              font-semibold
+              text-gray-800
+            ">
+              <%= item.product.name %>
+            </h3>
+
+            <p class="
+              text-sm
+              text-gray-500
+              mt-1
+            ">
+              Quantidade:
+              <%= item.quantity %>
+            </p>
+
+          </div>
+
+          <div class="
+            text-right
+          ">
+
+            <p class="
+              text-lg
+              font-bold
+              text-gray-900
+            ">
+              <%= number_to_currency(
+                    item.quantity * item.price
+                  ) %>
+            </p>
+
+            <p class="
+              text-sm
+              text-gray-400
+            ">
+              <%= number_to_currency(item.price) %> cada
+            </p>
+
+          </div>
+
+        </div>
+
+      <% end %>
+
+    </div>
+
+    <div class="
+      mt-8
+      pt-6
+      border-t border-gray-100
+      flex
+      items-center
+      justify-between
+    ">
+
+      <span class="
+        text-lg
+        font-medium
+        text-gray-500
+      ">
+        Total
+      </span>
+
+      <span class="
+        text-3xl
+        font-bold
+        text-gray-900
+      ">
+        <%= number_to_currency(@order.total) %>
+      </span>
+
+    </div>
+
+  </div>
+
+  <div class="
+    bg-white
+    rounded-3xl
+    shadow-xl
+    border border-gray-100
+    p-8
+  ">
+
+    <h2 class="
+      text-2xl
+      font-bold
+      text-gray-900
+      mb-6
+    ">
+      Ações do Pedido
+    </h2>
+
+    <div class="
+      flex
+      flex-wrap
+      gap-4
+    ">
+
+      <% if current_user.owner? && @order.pending? %>
+
+        <%= button_to "Aceitar pedido",
+                      preparing_restaurant_order_path(
+                        @order.restaurant,
+                        @order
+                      ),
+                      method: :patch,
+                      class: "
+                        bg-blue-500
+                        hover:bg-blue-600
+                        text-white
+                        font-semibold
+                        px-5
+                        py-3
+                        rounded-2xl
+                        shadow-md
+                        hover:shadow-lg
+                        transition-all
+                        duration-300
+                      " %>
+
+      <% end %>
+
+      <% unless @order.delivered? || @order.canceled? %>
+
+        <%= button_to "Cancelar pedido",
+                      cancel_restaurant_order_path(
+                        @order.restaurant,
+                        @order
+                      ),
+                      method: :patch,
+                      data: {
+                        turbo_confirm: "Cancelar pedido?"
+                      },
+                      class: "
+                        bg-red-500
+                        hover:bg-red-600
+                        text-white
+                        font-semibold
+                        px-5
+                        py-3
+                        rounded-2xl
+                        shadow-md
+                        hover:shadow-lg
+                        transition-all
+                        duration-300
+                      " %>
+
+      <% end %>
+
+      <% if current_user == @order.user %>
+        <% if @order.preparing? %>
+
+          <%= button_to "Confirmar entrega",
+                        confirm_delivery_restaurant_order_path(
+                          @order.restaurant,
+                          @order
+                        ),
+                        method: :patch,
+                        class: "
+                          bg-green-500
+                          hover:bg-green-600
+                          text-white
+                          font-semibold
+                          px-5
+                          py-3
+                          rounded-2xl
+                          shadow-md
+                          hover:shadow-lg
+                          transition-all
+                          duration-300
+                        " %>
+
+        <% end %>
+      <% end %>
+
+    </div>
+
+  </div>
+
+  <div>
+
+    <%= link_to "← Voltar para pedidos",
+                orders_path,
+                class: "
+                  inline-flex
+                  items-center
+                  text-gray-500
+                  hover:text-gray-900
+                  font-medium
+                  transition
+                " %>
+
+  </div>
+
+</div>

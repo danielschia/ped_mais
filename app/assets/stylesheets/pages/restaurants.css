@@ -1,0 +1,39 @@
+
+  @layer components {
+    .page-title {
+      @apply text-3xl font-bold text-gray-800 mb-6 pb-2 border-b-2 border-red-500 inline-block;
+    }
+
+    .new-restaurant-btn {
+      @apply inline-block bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg shadow-md transition duration-300 ease-in-out transform hover:scale-105 mb-6;
+    }
+
+    .restaurant-card {
+      @apply bg-white rounded-xl shadow-md hover:shadow-xl transition-all duration-300 overflow-hidden border border-gray-100 hover:border-red-200;
+    }
+
+    .restaurant-card-content {
+      @apply p-6;
+    }
+
+    .restaurant-name {
+      @apply text-2xl font-bold text-gray-800 mb-3 hover:text-red-600 transition-colors;
+    }
+
+    .restaurant-link {
+      @apply inline-flex items-center gap-2 text-red-600 font-medium hover:text-red-700 hover:gap-3 transition-all duration-300;
+    }
+
+    .restaurant-link::after {
+      content: "→";
+      @apply text-lg transition-transform duration-300;
+    }
+
+    .restaurant-link:hover::after {
+      @apply translate-x-1;
+    }
+    .main-text {
+    @apply text-4xl font-bold text-gray-900;
+  }
+  }
+
